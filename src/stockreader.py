@@ -2,11 +2,10 @@ import sys
 import toml
 import threading
 
+from influxdb import InfluxDBClient
 from infrastructure import log, time_series
 from admin import admin_api
-from stocks import job, read, mongo, domain, download, stocks_api
-
-from influxdb import InfluxDBClient
+from stocks import job, read, mongo, influx, domain, download, stocks_api
 
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
@@ -34,27 +33,38 @@ def read_stocks_from_exchange_file(config, exchange):
     stocks_from_exchange = read.read_stocks_from_multiple_files(exchange_file_path_list, exchange)
     return stocks_from_exchange
 
+def get_mongo(mongo_config):
+    host = mongo_config["host"]
+    port = mongo_config["port"]
+    dbname = mongo_config["dbname"]
+    mongo_client = mongo.Mongo(host, port, dbname)
+    return mongo_client
+
+def get_influx(influx_config):
+    host = influx_config["host"]
+    port = influx_config["port"]
+    dbname = influx_config["dbname"]
+    influx_client = InfluxDBClient(host, port, dbname)
+    influx_client.create_database(dbname)
+    influx_client.switch_database(dbname)
+    return influx_client
+
 # Initialize
+config = get_config()
 
 ## Mongo
-config = get_config()
 mongo_config = config["mongo"]
-dbHost = mongo_config["host"]
-dbPort = mongo_config["port"]
-dbName = mongo_config["name"]
-mongo = mongo.Mongo(dbHost, dbPort, dbName)
+mongo_persistence = get_mongo(mongo_config)
 
 ## Influx
 influx_config = config["influx"]
-inf_host = influx_config["host"]
-inf_port = influx_config["port"]
-inf_dbname = influx_config["name"]
-influx_client = InfluxDBClient(inf_host, inf_port, inf_dbname)
+influx_client = get_influx(influx_config)
 time_series = time_series.TimeSeries(influx_client)
+influx_persistence = influx.Influx(influx_client)
 
 read = read.Read()
 download = download.Download()
-domain = domain.Domain(mongo, download)
+domain = domain.Domain(mongo_persistence, influx_persistence, download)
 
 scheduler = BackgroundScheduler()
 job = job.Job(domain, scheduler, time_series)
