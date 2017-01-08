@@ -1,17 +1,19 @@
 [server]
 host = "localhost"
 port = 5000
-debug = false
+debug = true
 
 [mongo]
 host = "localhost"
 port = 27017
-name = "stockreaderdb"
+dbname = "stockreaderdb"
 
 [influx]
 host = "localhost"
 port = 8086
-name = "stockreaderdb"
+username = ""
+password = ""
+dbname = "stockreaderdb"
 
 [exchanges]
 nyse = [
