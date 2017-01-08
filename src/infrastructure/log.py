@@ -1,5 +1,7 @@
 import os
 import logging
+
+from infrastructure import files
 from logging.handlers import RotatingFileHandler
 
 def get_logger_handler(logFileName):
@@ -13,8 +15,8 @@ def get_logger(loggerName):
     logger = logging.getLogger(loggerName)
     logger.setLevel(logging.INFO)
     directory = "logs"
+    files.create_directory_if_not_exists(directory)
     file_name = "stockreader.log"
-    os.makedirs(directory, exist_ok=True)
     handler = get_logger_handler(directory + "/" + file_name)
     logger.addHandler(handler)
     return logger

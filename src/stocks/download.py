@@ -11,9 +11,9 @@ class Download:
         stock_historical_data_array = []
         base_url = "https://query.yahooapis.com/v1/public/yql"
         select_statement = 'select * from yahoo.finance.historicaldata where symbol = "{quote}" and startDate = "{initialDate}" and endDate = "{finalDate}"'.format(quote=quote, initialDate=initialDate, finalDate=finalDate)
-        query = urllib.parse.quote(select_statement)
+        query = urllib.quote(select_statement)
         result_format = 'json'
-        env = urllib.parse.quote("store://datatables.org/alltableswithkeys")
+        env = urllib.quote("store://datatables.org/alltableswithkeys")
         url = base_url + "?" + "q=" + query + "&format=" + result_format + "&env=" + env
         response = requests.get(url)
         status_code = response.status_code
@@ -31,9 +31,9 @@ class Download:
         stock_current_data = None
         base_url = "https://query.yahooapis.com/v1/public/yql"
         select_statement = 'select * from yahoo.finance.quote where symbol in ("{quote}")'.format(quote=quote)
-        query = urllib.parse.quote(select_statement)
+        query = urllib.quote(select_statement)
         result_format = 'json'
-        env = urllib.parse.quote("store://datatables.org/alltableswithkeys")
+        env = urllib.quote("store://datatables.org/alltableswithkeys")
         url = base_url + "?" + "q=" + query + "&format=" + result_format + "&env=" + env
         response = requests.get(url)
         status_code = response.status_code
