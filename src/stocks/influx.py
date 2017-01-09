@@ -13,7 +13,21 @@ class Influx:
             "measurement": self.CURRENT_DATA,
             "tags": {},
             "time": datetime.now().isoformat(),
-            "fields": stock_current_data
+            "fields": {
+                "symbol": stock_current_data["symbol"],
+                "stock_exchange": stock_current_data["stock_exchange"],
+                "name": stock_current_data["name"],
+                "change": stock_current_data["change"],
+                "days_range": stock_current_data["days_range"],
+                "market_capitalization": stock_current_data["market_capitalization"],
+                "average_daily_volume": float(stock_current_data["average_daily_volume"]),
+                "days_high": float(stock_current_data["days_high"]),
+                "days_low": float(stock_current_data["days_low"]),
+                "last_trade_price_only": float(stock_current_data["last_trade_price_only"]),
+                "volume": float(stock_current_data["volume"]),
+                "year_high": float(stock_current_data["year_high"]),
+                "year_low": float(stock_current_data["year_low"])
+            }
         }
         points = [data]
         self.client.write_points(points)
