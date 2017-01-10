@@ -3,17 +3,21 @@ host = "localhost"
 port = 5000
 debug = true
 
-[mongo]
+[mariadb]
 host = "localhost"
-port = 27017
-dbname = "stockreaderdb"
+port = 3306
+username = "root"
+password = "qwe"
+database = "stockreaderdb"
+pool_name = "mariadb_pool"
+pool_size = 10
 
 [influx]
 host = "localhost"
 port = 8086
 username = ""
 password = ""
-dbname = "stockreaderdb"
+database = "stockreaderdb"
 
 [exchanges]
 nyse = [

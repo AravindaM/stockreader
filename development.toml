@@ -1,17 +1,23 @@
 [server]
 host = "localhost"
 port = 5000
-debug = false
+debug = true
 
-[mongo]
-host = "mongodb"
-port = 27017
-name = "stockreaderdb"
+[mariadb]
+host = "localhost"
+port = 3306
+username = ""
+password = ""
+database = "stockreaderdb"
+pool_name = "mariadb_pool"
+pool_size = 10
 
 [influx]
-host = "influxdb"
+host = "localhost"
 port = 8086
-name = "stockreaderdb"
+username = ""
+password = ""
+database = "stockreaderdb"
 
 [exchanges]
 nyse = [
