@@ -3,9 +3,9 @@ import toml
 import threading
 
 from influxdb import InfluxDBClient
-from infrastructure import log, time_series
+from infrastructure import log, time_series, mariadb
 from admin import admin_api
-from stocks import job, read, mongo, influx, domain, download, stocks_api
+from stocks import job, read, domain, persistence, download, stocks_api
 
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
@@ -33,38 +33,31 @@ def read_stocks_from_exchange_file(config, exchange):
     stocks_from_exchange = read.read_stocks_from_multiple_files(exchange_file_path_list, exchange)
     return stocks_from_exchange
 
-def get_mongo(mongo_config):
-    host = mongo_config["host"]
-    port = mongo_config["port"]
-    dbname = mongo_config["dbname"]
-    mongo_client = mongo.Mongo(host, port, dbname)
-    return mongo_client
-
 def get_influx(influx_config):
     host = influx_config["host"]
     port = influx_config["port"]
-    dbname = influx_config["dbname"]
-    influx_client = InfluxDBClient(host, port, dbname)
-    influx_client.create_database(dbname)
-    influx_client.switch_database(dbname)
+    database = influx_config["database"]
+    influx_client = InfluxDBClient(host, port, database)
+    influx_client.create_database(database)
+    influx_client.switch_database(database)
     return influx_client
 
 # Initialize
 config = get_config()
 
-## Mongo
-mongo_config = config["mongo"]
-mongo_persistence = get_mongo(mongo_config)
+## MariaDB
+mariadb_config = config["mariadb"]
+mariadb_client = mariadb.MariaDB(mariadb_config)
 
 ## Influx
 influx_config = config["influx"]
 influx_client = get_influx(influx_config)
 time_series = time_series.TimeSeries(influx_client)
-influx_persistence = influx.Influx(influx_client)
 
 read = read.Read()
 download = download.Download()
-domain = domain.Domain(mongo_persistence, influx_persistence, download)
+persistence = persistence.Persistence(mariadb_client)
+domain = domain.Domain(persistence, download)
 
 scheduler = BackgroundScheduler()
 job = job.Job(domain, scheduler, time_series)
