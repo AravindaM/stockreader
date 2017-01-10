@@ -1,7 +1,6 @@
 import urllib
 import requests
-from infrastructure import json
-from infrastructure import log
+from infrastructure import json, log, strings
 
 logger = log.get_logger("download")
 
@@ -23,6 +22,7 @@ class Download:
             if count > 0:
                 stock_historical_data_array = body["query"]["results"]["quote"]
                 stock_historical_data_array = json.json_keys_to_lower_and_snake_case(stock_historical_data_array)
+                stock_historical_data_array = json.remove_single_quotes_from_json(stock_historical_data_array)
         else:
             logger.error("get_stock_historical_data: status_code: %i, body: %s", status_code, body)
         return stock_historical_data_array
@@ -43,6 +43,7 @@ class Download:
             if count > 0:
                 stock_current_data = body["query"]["results"]["quote"]
                 stock_current_data = json.json_keys_to_lower_and_snake_case(stock_current_data)
+                stock_current_data = json.remove_single_quotes_from_json(stock_current_data)
         else:
             logger.error("get_stock_current_data: status_code: %i, body: %s", status_code, body)
         return stock_current_data
