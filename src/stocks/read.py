@@ -1,5 +1,5 @@
 import csv
-from infrastructure import log
+from infrastructure import log, strings
 
 logger = log.get_logger("read")
 
@@ -12,9 +12,13 @@ class Read:
         next(reader) # Skip the first headers row.
         for row in reader:
             first_array = row[0].split("(")
-            name = first_array[0].strip()
             second_array = first_array[1].split(")")
+            # name
+            name = first_array[0].strip()
+            name = strings.remove_single_and_double_quotes(name)
+            # quote
             quote = second_array[0].strip()
+            quote = strings.remove_single_and_double_quotes(quote)
             stock = { "name": name, "symbol": quote, "stockMarket": stock_market}
             stocks.append(stock)
         return stocks
