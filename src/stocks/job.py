@@ -67,7 +67,6 @@ class Job:
 
     def add_stock_to_stockreader(self, stock):
         symbol = stock["symbol"]
-        logger.info('adding stock %s', symbol)
         if not self.domain.stock_exists(symbol):
             self.domain.add_stock_to_stock_list(stock)
             self.download_and_save_stock_current_data_in_parallel([stock])
